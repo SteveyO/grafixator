@@ -5,7 +5,7 @@ The Grafixator API loads in games created with Grafixator and allows developers 
 
 For more information on how to use the API,  see the Grafixator Page.
 
-http://www.grafixator.com/index.php/grafixator-api/
+http://www.grafixator.com/grafixator-api/
 
 <b>Note</b> Grafixator is currently in Alpha.  It is scheduled for public release late 2016.
 
