@@ -53,7 +53,7 @@ public class GrafixatorSprite {
     public boolean box2DBody;
     public boolean isPickup=false;
     
-    public boolean isDesctructable=false; // Can the sprite be shot?  Set as a Tile Property.
+    public boolean isDesctructible=false; // Can the sprite be shot?  Set as a Tile Property.
     public int hitsNeededToDestroy;       // This will default to 1, but can be increased in Tile Properties.
     public Body body;
     

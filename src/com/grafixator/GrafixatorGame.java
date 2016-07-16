@@ -262,7 +262,6 @@ public class GrafixatorGame {
 				currSprite.stateTime += Gdx.graphics.getDeltaTime();
 				if (currSprite.stateTime < 0) currSprite.stateTime=0;
 
-			    if (charMovement == GrafixatorConstants.CHARACTER_PLATFORMER || !currSprite.isHero) {   // For Platform Games we flip sprites when they change direction.
 			    batch.draw(currSprite.spriteAnimation.getKeyFrame(currSprite.stateTime, true), 
 			    		currSprite.xDir < 0 ? currSprite.xPos+currSprite.width : currSprite.xPos, 
 			            currSprite.yPos,  
@@ -273,19 +272,7 @@ public class GrafixatorGame {
 			            currSprite.renderWidth,    
 			            1f, 
 			            currSprite.rotation);	
-			    }
-			    else {
-				    batch.draw(currSprite.spriteAnimation.getKeyFrame(currSprite.stateTime, true), 
-				    		currSprite.xPos, 
-				            currSprite.yPos,  
-				            currSprite.width/2,
-				            currSprite.height/2,
-				            currSprite.width,
-				            currSprite.height,
-				            currSprite.renderWidth,    
-				            1f, 
-				            currSprite.rotation);	
-			    }                              
+                             
 			}
 			else {
 				batch.draw(currSprite.spriteTexture, 
@@ -408,6 +395,28 @@ public class GrafixatorGame {
 				currSprite.rotation+=currSprite.rotationSpeed*currSprite.rotationDirection;
 
 			}
+			
+            if (currSprite.rotating) {
+                if (!currSprite.fullRotation) {  // For partial rotation, we check the angle.
+                	if ( currSprite.rotationDirection == 1) {
+                		if (GrafixatorUtils.areAnglesApproxEqual(360 - currSprite.rotation, currSprite.rotationSpeed, currSprite.rotationStartAngle)) {
+                			currSprite.rotationDirection *= -1; // Reverse the direction
+                		}
+                	}
+                	if ( currSprite.rotationDirection == -1) {
+                		if (GrafixatorUtils.areAnglesApproxEqual(360 - currSprite.rotation, currSprite.rotationSpeed, currSprite.rotationEndAngle)) {
+                			currSprite.rotationDirection *= -1; // Reverse the direction
+                		}
+                	}
+
+                }
+                if ( currSprite.rotation >= 360) currSprite.rotation = 0;
+                if ( currSprite.rotation < 0)   currSprite.rotation =360;
+               
+                currSprite.rotation+=currSprite.rotationSpeed*currSprite.rotationDirection;
+   
+            }
+			
 
 			if (currSprite.shrinkExpanding) {
 
@@ -446,7 +455,7 @@ public class GrafixatorGame {
 				if (currSprite.status == GrafixatorSprite.SPRITE_STATUS_INACTIVE) continue;
 
 				// Collision with a sprite                   
-				if (currSprite!=null && currSprite.isDesctructable && !currSprite.isHero && bullet.fireByPlayer && GrafixatorUtils.overlapRectangles((int) currSprite.xPos, (int) currSprite.yPos, currSprite.width, currSprite.height, (int) bullet.bulletXPos, (int) bullet.bulletYPos, bullet.width,bullet.height)) {
+				if (currSprite!=null && currSprite.isDesctructible && !currSprite.isHero && bullet.fireByPlayer && GrafixatorUtils.overlapRectangles((int) currSprite.xPos, (int) currSprite.yPos, currSprite.width, currSprite.height, (int) bullet.bulletXPos, (int) bullet.bulletYPos, bullet.width,bullet.height)) {
 
 					bullet.status = GrafixatorBullet.BULLET_STATUS_INACTIVE;
             	    if (bullet.pointLight !=null) { bullet.pointLight.remove();  bullet.pointLight = null; }
@@ -580,11 +589,17 @@ public class GrafixatorGame {
             		bullet.bulletXDir = 0;
             		bullet.bulletYDir = heroSprite.yDir; 
             	}
+            	else {
+            		bullet.bulletYDir=1;   // Prevent generating bullets that don't move.
+            	}
             }
             else if (playerFire == GrafixatorConstants.PLAYER_FIRE_HORIZONTAL) {
             	if (heroSprite.xDir !=0) {
             		bullet.bulletXDir = heroSprite.xDir; 
             		bullet.bulletYDir = 0; 
+            	}
+            	else {
+            		bullet.bulletXDir=1;   // Prevent generating bullets that don't move.
             	}
             }
             else {
@@ -753,7 +768,19 @@ public class GrafixatorGame {
 	        		 playerPosition.set(heroSprite.xPos, heroSprite.yPos, 0);
 	                 camera.position.lerp(playerPosition, 0.4f);
 	        	}
+	        }	 
+	        else if (cameraControl == GrafixatorConstants.CAMERA_CONTROL_PLAYER_CENTERED_X) {
+	        	if (!isPlayerBeingDragged) {
+	        		playerPosition.set(heroSprite.xPos, camera.position.y, 0);
+	        		camera.position.lerp(playerPosition, 0.4f);
+	        	}
 	        }	    
+	        else if (cameraControl == GrafixatorConstants.CAMERA_CONTROL_PLAYER_CENTERED_Y) {
+	        	if (!isPlayerBeingDragged) {
+	        		playerPosition.set(camera.position.x, heroSprite.yPos,  0);
+	        		camera.position.lerp(playerPosition, 0.4f);
+	        	}
+	        }
 	        else if (heroSprite !=null && cameraControl == GrafixatorConstants.CAMERA_CONTROL_VIEWPORT) {
 
 	            if (heroSprite.xPos < camera.position.x) {
@@ -1025,7 +1052,7 @@ public class GrafixatorGame {
 			}
 		}
 
-		if (moveUp && canMove(heroSprite,  0, 1))  {
+		else if (moveUp && canMove(heroSprite,  0, 1))  {
 			if (charFullSquare) {
 				if (movementStatus == GrafixatorConstants.GAME_STATUS_STATIC || movementStatus==GrafixatorConstants.GAME_STATUS_MOVING_FULL_SQUARE) {
 					movementStatus  = GrafixatorConstants.GAME_STATUS_MOVING; pixelsMoved = 0;
@@ -1150,6 +1177,10 @@ public class GrafixatorGame {
 		if (isPlayerBeingDragged && heroSprite != null) {
 			heroSprite.xPos=x - xOffset;
 			heroSprite.yPos=y - yOffset; 
+			
+			// Set the Player Direction, so sprite faces the direction he is being catapulted.
+	    	if (heroSprite.xPos < origPlayerXPos) heroSprite.xDir = 1;
+	    	else heroSprite.xDir = -1;
 		}
 	}
 

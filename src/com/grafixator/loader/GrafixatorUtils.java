@@ -217,6 +217,8 @@ public class GrafixatorUtils {
        if (cameraControl.equals("HORIZ"))         return GrafixatorConstants.CAMERA_CONTROL_HORIZONTAL;
        else if (cameraControl.equals("VERTICAL")) return GrafixatorConstants.CAMERA_CONTROL_VERTICAL;
        else if (cameraControl.equals("CENTERED")) return GrafixatorConstants.CAMERA_CONTROL_PLAYER_CENTERED;
+       else if (cameraControl.equals("CENTEREDX")) return GrafixatorConstants.CAMERA_CONTROL_PLAYER_CENTERED_X;
+       else if (cameraControl.equals("CENTEREDY")) return GrafixatorConstants.CAMERA_CONTROL_PLAYER_CENTERED_Y;
        else if (cameraControl.equals("VIEWPORT")) return GrafixatorConstants.CAMERA_CONTROL_VIEWPORT;
        else return GrafixatorConstants.CAMERA_CONTROL_NONE;
    }  
@@ -236,6 +238,13 @@ public class GrafixatorUtils {
 		}
 		
 		return defaultColor;  // Should never get here.  Fall back only.
+	}
+	
+	// This method is used to detect when a sprite has reached a certain angle (in order to switch it's direction).
+	// Its not quite as simple as a < or a > due to quadrants.
+	public static boolean areAnglesApproxEqual(float angle, float speed, float target) {
+		if (angle <= (target + speed) && angle >= (target - speed)) return true;
+		return false;
 	}
 	
 }

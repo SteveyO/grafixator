@@ -828,12 +828,29 @@ public class GrafixatorFileLoader {
 					if (rotateCW) sprite.rotationDirection=1;
 					else          sprite.rotationDirection=-1;
 				}
+				
+                boolean fullRotation = GrafixatorUtils.getPropertyBooleanValue(propValue, GrafixatorConstants.PROPERTY_VALUE_SPRITE_FULL_ROTATION, true);
+                if (!fullRotation) {
+                	sprite.fullRotation=false;
+                	sprite.rotationStartAngle = GrafixatorUtils.getPropertyFloatValue(propValue, GrafixatorConstants.PROPERTY_VALUE_SPRITE_ROTATION_START_ANGLE, 0);
+                	sprite.rotationEndAngle   = GrafixatorUtils.getPropertyFloatValue(propValue, GrafixatorConstants.PROPERTY_VALUE_SPRITE_ROTATION_END_ANGLE, 0);
+                	
+                	if (sprite.rotationDirection == -1) {  // If sprite is set to move clockwise, then set its initial direction to the Start Angle, otherwise End Angle
+                		sprite.rotation = 360 - sprite.rotationStartAngle;
+                	}
+                	else {
+                		sprite.rotation = 360 - sprite.rotationEndAngle;
+                	}
+                }
+                else {
+                	sprite.fullRotation=true;
+                }
 
 			}
-			if (currentProperties.containsKey(GrafixatorConstants.PROPERTY_KEY_DESTRUCTABLE)) {
-				sprite.isDesctructable=true;;
+			if (currentProperties.containsKey(GrafixatorConstants.PROPERTY_KEY_DESTRUCTIBLE)) {
+				sprite.isDesctructible=true;;
 
-				String propValue = (String) currentProperties.get(GrafixatorConstants.PROPERTY_KEY_DESTRUCTABLE);
+				String propValue = (String) currentProperties.get(GrafixatorConstants.PROPERTY_KEY_DESTRUCTIBLE);
 				if (propValue.equals(GrafixatorConstants.PROPERTY_VALUE_NO_VALUE)) {
 					sprite.hitsNeededToDestroy=1;
 				}

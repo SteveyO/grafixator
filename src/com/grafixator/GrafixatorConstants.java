@@ -25,6 +25,8 @@ public class GrafixatorConstants {
     public final static int CAMERA_CONTROL_HORIZONTAL       =  2;
     public final static int CAMERA_CONTROL_VERTICAL         =  3;
     public final static int CAMERA_CONTROL_VIEWPORT         =  4;
+    public final static int CAMERA_CONTROL_PLAYER_CENTERED_X  =  5;
+    public final static int CAMERA_CONTROL_PLAYER_CENTERED_Y  =  6;
         
     public static final String PROPERTY_KEY_BOX2D_BODY        = "BOX2D_BODY";
     public static final String PROPERTY_KEY_BOX2DLIGHT        = "BOX2DLIGHT";
@@ -36,7 +38,7 @@ public class GrafixatorConstants {
     public static final String PROPERTY_KEY_MAIN_CHARACTER    = "HERO_CHARACTER";
     public static final String PROPERTY_KEY_PLAYER_BULLET     = "PLAYER_BULLET";
     public static final String PROPERTY_KEY_ENEMY_BULLET      = "ENEMY_BULLET";
-    public static final String PROPERTY_KEY_DESTRUCTABLE      = "DESTRUCTABLE";
+    public static final String PROPERTY_KEY_DESTRUCTIBLE      = "DESTRUCTIBLE";
     public static final String PROPERTY_KEY_ENEMY_FIRE        = "ENEMY_FIRE";
     
     public static final String PROPERTY_VALUE_NO_VALUE="NO_VALUE";
@@ -59,6 +61,9 @@ public class GrafixatorConstants {
     public static final String PROPERTY_VALUE_SPRITE_SHAPE_SQUARE="SQ";
     public static final String PROPERTY_VALUE_SPRITE_ROTATION_SPEED="RS";
     public static final String PROPERTY_VALUE_SPRITE_ROTATE_CW="RD";
+    public static final String PROPERTY_VALUE_SPRITE_FULL_ROTATION="FULLR";
+    public static final String PROPERTY_VALUE_SPRITE_ROTATION_START_ANGLE="ROTS";
+    public static final String PROPERTY_VALUE_SPRITE_ROTATION_END_ANGLE="ROTE";
     public static final String PROPERTY_VALUE_SPRITE_HITS_TO_DESTROY="HITS";
     public static final String PROPERTY_VALUE_SPRITE_EFFECTS="EFF";
     
