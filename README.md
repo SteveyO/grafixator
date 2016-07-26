@@ -8,7 +8,8 @@ For more information on how to use the API,  see the Grafixator Page.
 http://www.grafixator.com/grafixator-api/
 
 YouTube Introduction Video: https://www.youtube.com/watch?v=ndx6cr7qSVU
-Grafixator API is shown around the 2:45 mark.
+
+Grafixator API is shown around the 2:45 mark ( https://youtu.be/ndx6cr7qSVU?t=166 ).
 
 <b>Note</b> Grafixator is currently in Alpha.  It is scheduled for public release late 2016.
 
