@@ -57,6 +57,9 @@ public class GrafixatorSprite {
     public int hitsNeededToDestroy;       // This will default to 1, but can be increased in Tile Properties.
     public Body body;
     
+	public int   spriteMovementType=-1; // -1 None,  0-Horizontal, 1-Vertical
+	public float spriteSpeed;
+    
 	public PointLight pointLight;
 	public ConeLight  coneLight;
     
@@ -89,6 +92,9 @@ public class GrafixatorSprite {
     public int xDir;
     public int yDir;
     public int status=SPRITE_STATUS_ACTIVE;
+    
+	public int origX;  // Original X Position in the Map.
+	public int origY;  // Original Y Position in the Map.
     
     public int tileNumber;
     public String userData;

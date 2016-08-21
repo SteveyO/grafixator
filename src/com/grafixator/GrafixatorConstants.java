@@ -35,6 +35,7 @@ public class GrafixatorConstants {
     public static final String PROPERTY_KEY_SHRINK_EXPAND     = "SHRINK_EXPAND";
     public static final String PROPERTY_KEY_PICKUP            = "PICKUP";
     public static final String PROPERTY_KEY_MOVING_PLATFORM   = "MOVING_PLATFORM";
+    public static final String PROPERTY_KEY_SPRITE_MOVEMENT   = "SPRITE_MOVEMENT";
     public static final String PROPERTY_KEY_MAIN_CHARACTER    = "HERO_CHARACTER";
     public static final String PROPERTY_KEY_PLAYER_BULLET     = "PLAYER_BULLET";
     public static final String PROPERTY_KEY_ENEMY_BULLET      = "ENEMY_BULLET";
@@ -67,6 +68,9 @@ public class GrafixatorConstants {
     public static final String PROPERTY_VALUE_SPRITE_HITS_TO_DESTROY="HITS";
     public static final String PROPERTY_VALUE_SPRITE_EFFECTS="EFF";
     
+    public static final String PROPERTY_VALUE_SPRITE_MOVEMENT= "SpriteMovement";
+    public static final String PROPERTY_VALUE_SPRITE_SPEED   = "SpriteSpeed";
+    
     public static final String PROPERTY_VALUE_CHARACTER_MOVEMENT        ="movementType";
     public static final String PROPERTY_VALUE_CHARACTER_MOVE_2_BOUNDARY ="moveToBoundary";
     public static final String PROPERTY_VALUE_CHARACTER_ROATE_TO_DIR    ="charRotateToDir";
@@ -85,6 +89,9 @@ public class GrafixatorConstants {
     public static final int    PROPERTY_VALUE_ENEMY_FIRE_TYPE_LEFT  =3;
     public static final int    PROPERTY_VALUE_ENEMY_FIRE_TYPE_RIGHT =4;
     public static final int    PROPERTY_VALUE_ENEMY_FIRE_TYPE_BOSS =5;
+    
+    public static final int SPRITE_MOVEMENT_HORIZONTAL=0;
+    public static final int SPRITE_MOVEMENT_VERTICAL=1;
     
     // Platformer Games
     public static final float DEFAULT_JUMP_VERTICAL_FORCE    = 8f;    

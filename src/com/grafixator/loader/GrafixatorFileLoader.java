@@ -790,8 +790,14 @@ public class GrafixatorFileLoader {
 			sprite.renderWidth = 1;
 			sprite.xPos = xPos;
 			sprite.yPos = yPos;              
-			sprite.status = GrafixatorSprite.SPRITE_STATUS_ACTIVE;
 			
+            sprite.origX = tileXPos;
+            sprite.origY = tileYPos;  
+            
+            System.out.println(sprite.origX);
+			
+			sprite.status = GrafixatorSprite.SPRITE_STATUS_ACTIVE;
+
             if (timeLineManager.containsTimeLine(spriteId, spriteIndex)) {
                 timeLineManager.addTimeLine(spriteId, spriteIndex, spriteTextureRegion, sprite);
             }
@@ -808,6 +814,18 @@ public class GrafixatorFileLoader {
 				int textureNo  = GrafixatorUtils.getPropertyIntValue(value, GrafixatorConstants.PROPERTY_VALUE_ENEMY_FIRE_TEXTURE, 0);
 				grafixatorGame.bulletTextureEnemy[textureNo] = spriteTextureRegion;
 			}
+			
+            if (currentProperties.containsKey(GrafixatorConstants.PROPERTY_KEY_SPRITE_MOVEMENT)) {
+            	String propValue = (String) currentProperties.get(GrafixatorConstants.PROPERTY_KEY_SPRITE_MOVEMENT);
+            	sprite.spriteMovementType = GrafixatorUtils.getPropertyIntValue(propValue, GrafixatorConstants.PROPERTY_VALUE_SPRITE_MOVEMENT,0);
+            	sprite.spriteSpeed        = GrafixatorUtils.getPropertyFloatValue(propValue, GrafixatorConstants.PROPERTY_VALUE_SPRITE_SPEED,0);
+            	if (sprite.spriteMovementType == GrafixatorConstants.SPRITE_MOVEMENT_HORIZONTAL) {
+            		sprite.xDir = 1;
+            	}
+            	else if (sprite.spriteMovementType == GrafixatorConstants.SPRITE_MOVEMENT_VERTICAL) {
+            		sprite.yDir = 1;
+            	}
+            }
 
 
 			if (currentProperties.containsKey(GrafixatorConstants.PROPERTY_KEY_ROTATE)) {

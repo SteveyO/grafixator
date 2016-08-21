@@ -390,6 +390,36 @@ public class GrafixatorGame {
             	  currSprite.rotation= (currSprite.body.getAngle() * 180) / 3.1415f;  
               }
             }
+            
+            
+            if (currSprite.spriteMovementType== GrafixatorConstants.SPRITE_MOVEMENT_HORIZONTAL) {
+                int xPos = (int) (currSprite.xPos - currSprite.xDir ) / tileWidth;
+                if (currSprite.xDir < 0) xPos++;
+
+               
+            	currSprite.xPos+=currSprite.xDir * currSprite.spriteSpeed;
+            	// MOVING_HORIZONTALLY
+            	if ((currSprite.xDir != 0 && mainLayer.getCell(xPos + (int) currSprite.xDir, currSprite.origY) !=null) || ( currSprite.xDir == 1 && xPos >= numberOfColumns) || ( currSprite.xDir == -1 && xPos <=0)) {
+
+            		if (currSprite.xDir !=0 && !currSprite.isHero) {
+            			currSprite.xDir *=-1;
+            		}
+            	}
+            }
+
+            else if (currSprite.spriteMovementType== GrafixatorConstants.SPRITE_MOVEMENT_VERTICAL) {
+            	int yPos = (int) (currSprite.yPos - currSprite.yDir ) / tileHeight;
+                if (currSprite.yDir > 0) yPos++;
+                
+            	currSprite.yPos+=currSprite.yDir * currSprite.spriteSpeed;
+
+            	// MOVING_VERTICALLY
+            	if (currSprite.yDir != 0 && mainLayer.getCell(currSprite.origX,  yPos - (int) currSprite.xDir) !=null || yPos > numberOfRows || yPos <=0) {     
+            		if (currSprite.yDir !=0 && !currSprite.isHero) {
+            			currSprite.yDir *=-1;
+            		}
+            	}
+            }
 
 			if (currSprite.rotating) {
 				currSprite.rotation+=currSprite.rotationSpeed*currSprite.rotationDirection;
