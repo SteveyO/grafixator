@@ -120,7 +120,7 @@ public class GrafixatorFileLoader {
 
 		TextureRegion[][] splitTiles;
 		splitTiles     = TextureRegion.split(tilesTexture, grafixatorGame.tileWidth + padding, grafixatorGame.tileHeight + padding);
-
+		grafixatorGame.allTiles = splitTiles;
 
 		map = new TiledMap();
 		MapLayers layers = map.getLayers();     
@@ -318,7 +318,8 @@ public class GrafixatorFileLoader {
 
 			
 			if (propertiesElement2!=null) {
-				boolean playerBullet=false;  // To handle special case of properties having playerBullet AND box2d ligth (as these are set in the model.
+				boolean playerBullet= false;  // To handle special case of properties having playerBullet AND box2d light.
+				boolean enemyBullet = false;  // To handle special case of properties having playerBullet AND box2d light.
 
 				Iterator<Element> propertiesIterator = propertiesElement2.getChildrenByName("property").iterator();	
 				while(propertiesIterator.hasNext()){
@@ -326,6 +327,9 @@ public class GrafixatorFileLoader {
 					String key          = propertyElement.getAttribute("key");
 					if (key.equals(GrafixatorConstants.PROPERTY_KEY_PLAYER_BULLET)) {		                        
 						playerBullet=true;     
+					}
+					if (key.equals(GrafixatorConstants.PROPERTY_KEY_ENEMY_BULLET)) {		                        
+						enemyBullet=true;     
 					}
 				}
 				
@@ -351,7 +355,10 @@ public class GrafixatorFileLoader {
 //						grafixatorGame.bulletTextureEnemy[textureNo]=sprite.spriteTexture;                        
 //					}
 					if (key.equals(GrafixatorConstants.PROPERTY_KEY_BOX2DLIGHT) && playerBullet) {
-						setBulletBox2dLight(value, grafixatorGame);
+						setPlayerBulletBox2dLight(value, grafixatorGame);
+					}
+					if (key.equals(GrafixatorConstants.PROPERTY_KEY_BOX2DLIGHT) && enemyBullet) {
+						setEnemyBulletBox2dLight(value, grafixatorGame);
 					}
 
 				}
@@ -638,13 +645,17 @@ public class GrafixatorFileLoader {
 
 		while(tilesIterator.hasNext()){
 			XmlReader.Element tileElement = (XmlReader.Element)tilesIterator.next();
-			boolean playerBullet=false;  // To handle special case of properties having playerBullet AND box2d ligth (as these are set in the model.
+			boolean playerBullet=false;  // To handle special case of properties having playerBullet AND box2d light.
+			boolean enemyBullet=false;  // To handle special case of properties having enemyBullet AND box2d light.
 			Iterator<Element> propertiesIterator = tileElement.getChildrenByName("property").iterator();	
 			while(propertiesIterator.hasNext()){
 				XmlReader.Element propertyElement = (Element)propertiesIterator.next();
 				String key          = propertyElement.getAttribute("key");
 				if (key.equals(GrafixatorConstants.PROPERTY_KEY_PLAYER_BULLET)) {		                        
 					playerBullet=true;        
+				}
+				if (key.equals(GrafixatorConstants.PROPERTY_KEY_ENEMY_BULLET)) {		                        
+					enemyBullet=true;        
 				}
 			}
 
@@ -662,7 +673,11 @@ public class GrafixatorFileLoader {
 				addValues(tilePropertiesMap, tileNumber, keyValue);
 				
 				if (key.equals(GrafixatorConstants.PROPERTY_KEY_BOX2DLIGHT) && playerBullet) {
-					setBulletBox2dLight(value, grafixatorGame);
+					setPlayerBulletBox2dLight(value, grafixatorGame);
+				}
+				
+				if (key.equals(GrafixatorConstants.PROPERTY_KEY_BOX2DLIGHT) && enemyBullet) {
+					setEnemyBulletBox2dLight(value, grafixatorGame);
 				}
 
 				//	 tilePropertiesMap.put(tileNumber, keyValue);   // TODO Use the Tile Value sometime??
@@ -794,8 +809,6 @@ public class GrafixatorFileLoader {
             sprite.origX = tileXPos;
             sprite.origY = tileYPos;  
             
-            System.out.println(sprite.origX);
-			
 			sprite.status = GrafixatorSprite.SPRITE_STATUS_ACTIVE;
 
             if (timeLineManager.containsTimeLine(spriteId, spriteIndex)) {
@@ -901,6 +914,7 @@ public class GrafixatorFileLoader {
 				if (isAnimation) {
 					sprite.spriteAnimation=animation; 
 					sprite.isAnimation=true;
+					sprite.spriteTexture=animation.getKeyFrames()[0];   // Get first frame of animation (this is uses in particle explosions). 
 					sprite.xDir=1;         
 				}
 				else {
@@ -1140,11 +1154,19 @@ public class GrafixatorFileLoader {
 		return pointsList;
 	}
 	
-	public static void setBulletBox2dLight(String value, GrafixatorGame grafixatorGame) {
+	public static void setPlayerBulletBox2dLight(String value, GrafixatorGame grafixatorGame) {
 		int noRays = GrafixatorUtils.getPropertyIntValue(value, GrafixatorConstants.PROPERTY_VALUE_BOX2DLIGHT_NO_RAYS, 16);
 		Color rayColor = GrafixatorUtils.getColorFromString(GrafixatorUtils.getPropertyStringValue(value, GrafixatorConstants.PROPERTY_VALUE_BOX2DLIGHT_COLOR), Color.RED);
 		float distance = GrafixatorUtils.getPropertyFloatValue(value,  GrafixatorConstants.PROPERTY_VALUE_BOX2DLIGHT_DISTANCE, 120);   // Usually distance is around 3xwidth, so 120 is a guess.  Should never happen tho as it shd be populated.
 		grafixatorGame.playerBulletPointLight = new PointLight(grafixatorGame.rayHandler, noRays, rayColor, distance, -1000000,-1000000);
+	}
+
+	public static void setEnemyBulletBox2dLight(String value, GrafixatorGame grafixatorGame) {
+		int noRays = GrafixatorUtils.getPropertyIntValue(value, GrafixatorConstants.PROPERTY_VALUE_BOX2DLIGHT_NO_RAYS, 16);
+		Color rayColor = GrafixatorUtils.getColorFromString(GrafixatorUtils.getPropertyStringValue(value, GrafixatorConstants.PROPERTY_VALUE_BOX2DLIGHT_COLOR), Color.RED);
+		float distance = GrafixatorUtils.getPropertyFloatValue(value,  GrafixatorConstants.PROPERTY_VALUE_BOX2DLIGHT_DISTANCE, 120);   // Usually distance is around 3xwidth, so 120 is a guess.  Should never happen tho as it shd be populated.
+		int textureNo =GrafixatorUtils.getPropertyIntValue(value, GrafixatorConstants.PROPERTY_VALUE_ENEMY_FIRE_TEXTURE, 0);
+		grafixatorGame.enemyBulletPointLight[textureNo] = new PointLight(grafixatorGame.rayHandler, noRays, rayColor, distance, -1000000,-1000000);
 	}
 
 	private static TextureRegion extractTextureRegion(Texture texture, int xPos, int yPos, int width, int height) {

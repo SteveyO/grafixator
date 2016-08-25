@@ -67,9 +67,10 @@ public class GrafixatorGame {
     
     public List<GrafixatorObject>      collisionObjectsList   = new ArrayList<GrafixatorObject>();  // List of all Collision Objects (Paths/Vertices, Circles, Triangles or Rectangles). These are added as Box2D shapes to your game.
 
-	
+    public TextureRegion[][]           allTiles;              // An array of all the tiles in your map. Mostly for convenience in case you want to use any in your game (outside of the tilemap, or for switching tile textures in your game).
+    
 	// bullet pool (as to not create Bullet Instances in Game Loop).
-	private final Pool<GrafixatorBullet> bulletPool = new Pool<GrafixatorBullet>() {
+	public final Pool<GrafixatorBullet> bulletPool = new Pool<GrafixatorBullet>() {
 		@Override
 		protected GrafixatorBullet newObject() {
 			return new GrafixatorBullet();
@@ -472,8 +473,14 @@ public class GrafixatorGame {
 			mainCharBody.setLinearVelocity(0, charUpwardsForce);
 	}
 	
-	// Returns true if bullet hits enemy.
-	public boolean drawAndUpdateBullets(Batch batch, OrthographicCamera camera) {
+
+	/*
+	 * Returns: -1  No collision
+	 *           0  Bullet with a wall collision (Usually this is the same as -1,  no effect really except we remove bullets here and add particle effect).
+	 *           1  Player bullet with 'Destructible' sprite
+	 *           2  Enemy bullet with Player.
+	 */
+	public int drawAndUpdateBullets(Batch batch, OrthographicCamera camera) {
 		for (GrafixatorBullet bullet: bulletsList) {          
 			if (bullet.status==GrafixatorBullet.BULLET_STATUS_INACTIVE) continue;
 
@@ -504,12 +511,23 @@ public class GrafixatorGame {
 						if (useParticles) {
 							ParticleEffectManager.getInstance().addEffect(new Sprite(currSprite.spriteTexture), GrafixatorParticle.EFFECT_TYPE_EXPLOSION, currSprite.xPos + currSprite.width/2, currSprite.yPos + currSprite.height, 100, noParticles, particleVelocity, particleGravity);
 						}
+						return 1;
 
 					}
 					else {
 						currSprite.hitsNeededToDestroy--;
 					}
-				}                                                   
+				}  
+				
+	            // Enemy Bullet Collision with player.
+	            if (currSprite.isHero && !bullet.fireByPlayer && GrafixatorUtils.overlapRectangles((int) currSprite.xPos, (int) currSprite.yPos, currSprite.width, currSprite.height, (int) bullet.bulletXPos, (int) bullet.bulletYPos, bullet.width,bullet.height)) {
+	            	bullet.status = GrafixatorBullet.BULLET_STATUS_INACTIVE;
+	    			if (useParticles) {				
+	    				ParticleEffectManager.getInstance().addEffect(new Sprite(heroSprite.spriteTexture), GrafixatorParticle.EFFECT_TYPE_PICKUP, heroSprite.xPos + heroSprite.width/2, heroSprite.yPos + heroSprite.height, 100, 6, 0.5f, 500);
+	    				ParticleEffectManager.getInstance().addEffect(new Sprite(heroSprite.spriteTexture), GrafixatorParticle.EFFECT_TYPE_EXPLOSION, heroSprite.xPos + heroSprite.width/2, heroSprite.yPos + heroSprite.height, 100,noParticles,  particleVelocity, particleGravity);
+	    			}
+                   return 2;               
+	            }	
 			}
 
 
@@ -538,7 +556,7 @@ public class GrafixatorGame {
 						}
 					}
 
-					return true;
+					return -1;
 				}
 
 			}
@@ -569,7 +587,7 @@ public class GrafixatorGame {
 			lastBulletCleanUp = System.currentTimeMillis();
 		}       
 
-		return false;
+		return -1;
 	}  
 
 
@@ -587,25 +605,14 @@ public class GrafixatorGame {
             		heroSprite.yPos + (heroSprite.height/2 - bulletPlayerTexture.getRegionHeight()/2));
             
 
-			if (heroSprite.isAnimation) {
-				bullet.bulletYPos = heroSprite.yPos - (heroSprite.height/2 + bulletPlayerTexture.getRegionHeight()/2);
-			}
+			bullet.bulletXPos += bulletXOffset;
+			bullet.bulletYPos += bulletYOffset;
 
 			bullet.width=bulletPlayerTexture.getRegionWidth();
 			bullet.height=bulletPlayerTexture.getRegionHeight();
 			bullet.rotation = heroSprite.rotation;
 			bullet.status = GrafixatorBullet.BULLET_STATUS_ACTIVE;
 
-			if (playerFire == GrafixatorConstants.PLAYER_FIRE_VERTICAL) {
-				bullet.bulletYDir = bulletSpeed/bulletSpeed;
-			}
-			else if (playerFire == GrafixatorConstants.PLAYER_FIRE_HORIZONTAL) {
-				bullet.bulletXDir = bulletSpeed/bulletSpeed;
-			}
-			else {
-				bullet.bulletXDir = heroSprite.xDir;
-				bullet.bulletYDir = heroSprite.yDir;    
-			}
 			
             if (playerFire == GrafixatorConstants.PLAYER_FIRE_PLAYER_DIRECTION || (charMovement == GrafixatorConstants.CHARACTER_SPACESHIP && !charFixedRotation)) {
                 float angle = heroSprite.rotation;
@@ -616,21 +623,21 @@ public class GrafixatorGame {
             }
             else if (playerFire == GrafixatorConstants.PLAYER_FIRE_VERTICAL) {
             	if (heroSprite.yDir !=0) {
-            		bullet.bulletXDir = 0;
             		bullet.bulletYDir = heroSprite.yDir; 
             	}
             	else {
             		bullet.bulletYDir=1;   // Prevent generating bullets that don't move.
             	}
+            	bullet.bulletXDir = 0;
             }
             else if (playerFire == GrafixatorConstants.PLAYER_FIRE_HORIZONTAL) {
             	if (heroSprite.xDir !=0) {
             		bullet.bulletXDir = heroSprite.xDir; 
-            		bullet.bulletYDir = 0; 
             	}
             	else {
             		bullet.bulletXDir=1;   // Prevent generating bullets that don't move.
             	}
+        		bullet.bulletYDir = 0; 
             }
             else {
                 bullet.bulletXDir = heroSprite.xDir;
@@ -649,7 +656,6 @@ public class GrafixatorGame {
             if (playerBulletPointLight !=null) {                    	 
             	bullet.pointLight = new PointLight(rayHandler, playerBulletPointLight.getRayNum(),  playerBulletPointLight.getColor(),  playerBulletPointLight.getDistance(), bullet.bulletXPos + bullet.width/2, bullet.bulletYPos + bullet.height/2);
             }
-
 
 			bulletsList.add(bullet);    
 			return true;           
@@ -727,8 +733,14 @@ public class GrafixatorGame {
 		
 		bullet.fireByPlayer=false;
 		bullet.speed=speed;
-		bullet.texture = bulletTextureEnemy[textureNumber];;
+		bullet.texture = bulletTextureEnemy[textureNumber];
 		bullet.rotation = angle;
+		
+		if (enemyBulletPointLight[textureNumber] !=null) {
+			   bullet.pointLight = new PointLight(rayHandler, enemyBulletPointLight[textureNumber].getRayNum(),  
+					   enemyBulletPointLight[textureNumber].getColor(),  enemyBulletPointLight[textureNumber].getDistance(), 
+					   bullet.bulletXPos + bullet.width/2, bullet.bulletYPos + bullet.height/2);
+			}
 
 		if (type == GrafixatorConstants.PROPERTY_VALUE_ENEMY_FIRE_TYPE_DOWN)       { bullet.bulletYDir=-1;  bullet.bulletXDir=0;  }
 		else if (type == GrafixatorConstants.PROPERTY_VALUE_ENEMY_FIRE_TYPE_UP)    { bullet.bulletYDir=1;   bullet.bulletXDir=0;  }
