@@ -586,7 +586,6 @@ public class GrafixatorGame {
 		    
 			lastBulletCleanUp = System.currentTimeMillis();
 		}       
-
 		return -1;
 	}  
 
@@ -775,7 +774,7 @@ public class GrafixatorGame {
 
 	}
 	
-	public void handleCameraMovement(OrthographicCamera camera) {
+	public void handleCameraMovement(OrthographicCamera camera, float delta) {
 	       if (cameraControl == GrafixatorConstants.CAMERA_CONTROL_HORIZONTAL) {
 	        	if (cameraAutoStop) {
 	        		if (cameraSpeed > 0 && camera.position.x < cameraHorizStopPosition || cameraSpeed < 0 && camera.position.x > cameraHorizStopPosition) {

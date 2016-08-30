@@ -70,6 +70,7 @@ public class GrafixatorConstants {
     
     public static final String PROPERTY_VALUE_SPRITE_MOVEMENT= "SpriteMovement";
     public static final String PROPERTY_VALUE_SPRITE_SPEED   = "SpriteSpeed";
+    public static final String PROPERTY_VALUE_INIT_DIR       = "SpriteInitDir";
     
     public static final String PROPERTY_VALUE_CHARACTER_MOVEMENT        ="movementType";
     public static final String PROPERTY_VALUE_CHARACTER_MOVE_2_BOUNDARY ="moveToBoundary";

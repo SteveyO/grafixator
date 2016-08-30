@@ -832,11 +832,15 @@ public class GrafixatorFileLoader {
             	String propValue = (String) currentProperties.get(GrafixatorConstants.PROPERTY_KEY_SPRITE_MOVEMENT);
             	sprite.spriteMovementType = GrafixatorUtils.getPropertyIntValue(propValue, GrafixatorConstants.PROPERTY_VALUE_SPRITE_MOVEMENT,0);
             	sprite.spriteSpeed        = GrafixatorUtils.getPropertyFloatValue(propValue, GrafixatorConstants.PROPERTY_VALUE_SPRITE_SPEED,0);
+            	
+            	int initDir = GrafixatorUtils.getPropertyIntValue(propValue, GrafixatorConstants.PROPERTY_VALUE_INIT_DIR,0);
+            	if (initDir == 0) initDir = -1;   // Values are 0 (Left or Up) or 1 (Right or Down),  so if 0 set to -1;
+            	
             	if (sprite.spriteMovementType == GrafixatorConstants.SPRITE_MOVEMENT_HORIZONTAL) {
-            		sprite.xDir = 1;
+            		sprite.xDir = initDir;
             	}
             	else if (sprite.spriteMovementType == GrafixatorConstants.SPRITE_MOVEMENT_VERTICAL) {
-            		sprite.yDir = 1;
+            		sprite.yDir = -initDir;
             	}
             }
 
