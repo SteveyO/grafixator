@@ -66,6 +66,7 @@ public class GrafixatorSprite {
     public float velocity;
     
     public boolean enemyFire=false;
+    public float enemyFireInterval=2;
     public int bulletTextureNo;   // 0-9 
     public int enemyFireDirection;
     public int enemyFireSpeed;

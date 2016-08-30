@@ -320,16 +320,20 @@ public class GrafixatorFileLoader {
 			if (propertiesElement2!=null) {
 				boolean playerBullet= false;  // To handle special case of properties having playerBullet AND box2d light.
 				boolean enemyBullet = false;  // To handle special case of properties having playerBullet AND box2d light.
-
+                int enemyBulletTextureNo=0;   
+				
 				Iterator<Element> propertiesIterator = propertiesElement2.getChildrenByName("property").iterator();	
 				while(propertiesIterator.hasNext()){
 					XmlReader.Element propertyElement = (Element)propertiesIterator.next();
 					String key          = propertyElement.getAttribute("key");
+					String value        = propertyElement.getAttribute("value");
+					
 					if (key.equals(GrafixatorConstants.PROPERTY_KEY_PLAYER_BULLET)) {		                        
 						playerBullet=true;     
 					}
 					if (key.equals(GrafixatorConstants.PROPERTY_KEY_ENEMY_BULLET)) {		                        
-						enemyBullet=true;     
+						enemyBullet=true;   
+						enemyBulletTextureNo = GrafixatorUtils.getPropertyIntValue(value, GrafixatorConstants.PROPERTY_VALUE_ENEMY_FIRE_TEXTURE, 0);
 					}
 				}
 				
@@ -350,15 +354,11 @@ public class GrafixatorFileLoader {
 						grafixatorGame.bulletTextureEnemy[textureNo]=extractTextureRegion(spritesTexture,  coords[0], coords[1], spriteWidth, spriteHeight);                      
 					}
 					
-//					if (key.equals(GrafixatorConstants.PROPERTY_KEY_ENEMY_BULLET)) {		
-//						int textureNo  = GrafixatorUtils.getPropertyIntValue(value, GrafixatorConstants.PROPERTY_VALUE_ENEMY_FIRE_TEXTURE, 0);  
-//						grafixatorGame.bulletTextureEnemy[textureNo]=sprite.spriteTexture;                        
-//					}
 					if (key.equals(GrafixatorConstants.PROPERTY_KEY_BOX2DLIGHT) && playerBullet) {
 						setPlayerBulletBox2dLight(value, grafixatorGame);
 					}
 					if (key.equals(GrafixatorConstants.PROPERTY_KEY_BOX2DLIGHT) && enemyBullet) {
-						setEnemyBulletBox2dLight(value, grafixatorGame);
+						setEnemyBulletBox2dLight(value, grafixatorGame, enemyBulletTextureNo);
 					}
 
 				}
@@ -647,15 +647,20 @@ public class GrafixatorFileLoader {
 			XmlReader.Element tileElement = (XmlReader.Element)tilesIterator.next();
 			boolean playerBullet=false;  // To handle special case of properties having playerBullet AND box2d light.
 			boolean enemyBullet=false;  // To handle special case of properties having enemyBullet AND box2d light.
+            int enemyBulletTextureNo=0;
+
 			Iterator<Element> propertiesIterator = tileElement.getChildrenByName("property").iterator();	
 			while(propertiesIterator.hasNext()){
 				XmlReader.Element propertyElement = (Element)propertiesIterator.next();
 				String key          = propertyElement.getAttribute("key");
+				String value        = propertyElement.getAttribute("value");
+				
 				if (key.equals(GrafixatorConstants.PROPERTY_KEY_PLAYER_BULLET)) {		                        
 					playerBullet=true;        
 				}
 				if (key.equals(GrafixatorConstants.PROPERTY_KEY_ENEMY_BULLET)) {		                        
-					enemyBullet=true;        
+					enemyBullet=true;     
+					enemyBulletTextureNo = GrafixatorUtils.getPropertyIntValue(value, GrafixatorConstants.PROPERTY_VALUE_ENEMY_FIRE_TEXTURE, 0);
 				}
 			}
 
@@ -677,7 +682,7 @@ public class GrafixatorFileLoader {
 				}
 				
 				if (key.equals(GrafixatorConstants.PROPERTY_KEY_BOX2DLIGHT) && enemyBullet) {
-					setEnemyBulletBox2dLight(value, grafixatorGame);
+					setEnemyBulletBox2dLight(value, grafixatorGame, enemyBulletTextureNo);
 				}
 
 				//	 tilePropertiesMap.put(tileNumber, keyValue);   // TODO Use the Tile Value sometime??
@@ -905,8 +910,10 @@ public class GrafixatorFileLoader {
 				String propValue = (String) currentProperties.get(GrafixatorConstants.PROPERTY_KEY_ENEMY_FIRE);
 				sprite.enemyFire=true;
 				sprite.enemyFireDirection = GrafixatorUtils.getPropertyIntValue(propValue, GrafixatorConstants.PROPERTY_VALUE_ENEMY_FIRE, 4);
+			
 				sprite.nextFireTime = System.currentTimeMillis() + 1000 + rand.nextInt(1000); 
 				sprite.enemyFireSpeed=GrafixatorUtils.getPropertyIntValue(propValue, GrafixatorConstants.PROPERTY_VALUE_ENEMY_FIRE_SPEED, 4);
+				sprite.enemyFireInterval= GrafixatorUtils.getPropertyFloatValue(propValue, GrafixatorConstants.PROPERTY_VALUE_ENEMY_FIRE_INTERVAL, 2);
 				sprite.bulletTextureNo = GrafixatorUtils.getPropertyIntValue(propValue, GrafixatorConstants.PROPERTY_VALUE_ENEMY_FIRE_TEXTURE, 0);
 			}
 
@@ -1165,11 +1172,11 @@ public class GrafixatorFileLoader {
 		grafixatorGame.playerBulletPointLight = new PointLight(grafixatorGame.rayHandler, noRays, rayColor, distance, -1000000,-1000000);
 	}
 
-	public static void setEnemyBulletBox2dLight(String value, GrafixatorGame grafixatorGame) {
+	public static void setEnemyBulletBox2dLight(String value, GrafixatorGame grafixatorGame, int textureNo) {
 		int noRays = GrafixatorUtils.getPropertyIntValue(value, GrafixatorConstants.PROPERTY_VALUE_BOX2DLIGHT_NO_RAYS, 16);
 		Color rayColor = GrafixatorUtils.getColorFromString(GrafixatorUtils.getPropertyStringValue(value, GrafixatorConstants.PROPERTY_VALUE_BOX2DLIGHT_COLOR), Color.RED);
 		float distance = GrafixatorUtils.getPropertyFloatValue(value,  GrafixatorConstants.PROPERTY_VALUE_BOX2DLIGHT_DISTANCE, 120);   // Usually distance is around 3xwidth, so 120 is a guess.  Should never happen tho as it shd be populated.
-		int textureNo =GrafixatorUtils.getPropertyIntValue(value, GrafixatorConstants.PROPERTY_VALUE_ENEMY_FIRE_TEXTURE, 0);
+
 		grafixatorGame.enemyBulletPointLight[textureNo] = new PointLight(grafixatorGame.rayHandler, noRays, rayColor, distance, -1000000,-1000000);
 	}
 

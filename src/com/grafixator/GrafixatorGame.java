@@ -336,8 +336,19 @@ public class GrafixatorGame {
 					enemyPosition.y = currSprite.yPos;
 
 					if (camera.frustum.pointInFrustum(enemyPosition)) {
-						addEnemyBullet((int) currSprite.xPos, (int) currSprite.yPos, currSprite.width, currSprite.height, currSprite.bulletTextureNo, currSprite.enemyFireDirection, currSprite.enemyFireSpeed, currSprite.rotation);
-						currSprite.nextFireTime = System.currentTimeMillis() + 1000 + rand.nextInt(1000); 
+                    	if (currSprite.enemyFireDirection == GrafixatorConstants.PROPERTY_VALUE_ENEMY_FIRE_TYPE_BOSS) {
+                    		for (int i=0; i<=18; i++) {
+                    			float rotation=i*20;
+                    			addEnemyBullet((int) currSprite.xPos, (int) currSprite.yPos, currSprite.width, currSprite.height, currSprite.bulletTextureNo, currSprite.enemyFireDirection, currSprite.enemyFireSpeed, rotation);
+                    		}
+                    	}
+                    	else {
+                    		addEnemyBullet((int) currSprite.xPos, (int) currSprite.yPos, currSprite.width, currSprite.height, currSprite.bulletTextureNo, currSprite.enemyFireDirection, currSprite.enemyFireSpeed, currSprite.rotation);
+                    	}
+                    	
+                    	long nextFireTime = (long) (1000  * currSprite.enemyFireInterval);
+                        currSprite.nextFireTime = System.currentTimeMillis() + nextFireTime + rand.nextInt(1000); 
+						
 					}                       
 
 				}
@@ -719,11 +730,10 @@ public class GrafixatorGame {
 	public void addEnemyBullet(int xPos, int yPos,int width, int height,  int textureNumber, int type,  int speed, float angle) {
 
 		GrafixatorBullet bullet = bulletPool.obtain();
-        
         bullet.texture = bulletTextureEnemy[textureNumber];
 		if (bullet.texture==null) return;
-		
-        bullet.init(false, bulletSpeed,  bullet.texture, 
+
+        bullet.init(false, speed,  bullet.texture, 
         		xPos + width/2  - bullet.texture.getRegionWidth()/2, 
         		yPos + height/2 - bullet.texture.getRegionHeight()/2);
                 

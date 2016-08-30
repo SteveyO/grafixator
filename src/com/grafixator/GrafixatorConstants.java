@@ -84,6 +84,7 @@ public class GrafixatorConstants {
     public static final String PROPERTY_VALUE_ENEMY_FIRE_TEXTURE="FireTexture";
     public static final String PROPERTY_VALUE_ENEMY_FIRE       ="FireDir";
     public static final String PROPERTY_VALUE_ENEMY_FIRE_SPEED ="FireSpeed";
+    public static final String PROPERTY_VALUE_ENEMY_FIRE_INTERVAL ="FireInterval";
     public static final int    PROPERTY_VALUE_ENEMY_FIRE_TYPE_PLAYER=0;
     public static final int    PROPERTY_VALUE_ENEMY_FIRE_TYPE_UP    =1;
     public static final int    PROPERTY_VALUE_ENEMY_FIRE_TYPE_DOWN  =2;
