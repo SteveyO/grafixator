@@ -171,10 +171,10 @@ public class GrafixatorGame {
 
 	public Vector3 playerPosition = new Vector3();                // Used for SpaceShip Games (to centre the camera).
 	public  Vector3 enemyPosition = new Vector3();                // Used for checking if sprite is offscreen (if so then don't fire).
-	private Vector3       bulletPositionVector = new Vector3();   // Used for checking if bullet is offscreen (in which case made inactive).
+	public Vector3       bulletPositionVector = new Vector3();   // Used for checking if bullet is offscreen (in which case made inactive).
 	public float          timeBetweenBulletFire=200;
 
-	private static long CLEAN_UP_BULLET_TIME = 5000;  // Every 5 seconds remove inactive bullets from list.
+	public static long CLEAN_UP_BULLET_TIME = 5000;  // Every 5 seconds remove inactive bullets from list.
 	public static long lastBulletCleanUp=System.currentTimeMillis();
 
 	public float mainCharStartX=0;  // Main Character start position (used for resetting to its initial position).
