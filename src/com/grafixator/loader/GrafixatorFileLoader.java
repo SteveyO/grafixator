@@ -82,7 +82,7 @@ public class GrafixatorFileLoader {
 				spriteSheetName   =  directory + "/" + getSpriteSheetAttribute(fh, spriteSheetName, "imageFile");     
 			}
 			else {   // This code is if a custom spriteSheetFileName is provided
-				spriteSheetName   = directory + "/" + spriteSheetFileName; 
+				spriteSheetName   = spriteSheetFileName; 
 			}
 			
 			grafixatorLoader.populateGameData(batch, grafixatorGame, fh, spriteSheetName, tilePropertieMap);            
@@ -103,6 +103,70 @@ public class GrafixatorFileLoader {
           }
 		
 		return grafixatorGame;
+	}
+	
+	/*
+	 * Convenience method that loads in layer (in a Grafixator file) and returns the data in a 2x2 array.
+	 * This can be useful for switching level data in game for example. 
+	*/
+	
+	public static int[][] loadLevelData(String fileName, String layerName, boolean isExternal, int cols, int rows) {		
+		int levelData[][] = new int[rows][cols];
+		
+		FileHandle fh=null;
+		
+		if (isExternal) {
+//			ExternalFileHandleResolver lf = new ExternalFileHandleResolver();
+			fh = Gdx.files.local(fileName);
+			
+		}
+		else {
+			fh = Gdx.files.internal(fileName);
+		}
+		
+		XmlReader xml = new XmlReader();
+		XmlReader.Element xml_element;
+		try {
+			xml_element = xml.parse(fh);
+			
+			XmlReader.Element allLayers = xml_element.getChildByName("layers");
+
+			Iterator<Element> tilesIterator = allLayers.getChildrenByName("layer").iterator();      
+
+			while(tilesIterator.hasNext()){
+				XmlReader.Element layerElement = (XmlReader.Element)tilesIterator.next();
+
+				String currLayerName       = layerElement.getAttribute("name");
+				Iterator<Element> iterator_level = layerElement.getChildrenByName("data").iterator();   
+
+				int row=0;
+				
+				if (currLayerName.equals(layerName)) {
+
+					while(iterator_level.hasNext()){
+						XmlReader.Element level_line = iterator_level.next();
+						String mapDataText = level_line.getText();
+						String tiles[] = mapDataText.split(",");
+
+						for (int col=0; col< tiles.length; col++) {
+							if (col < cols && row < rows) {
+							    levelData[row][col] = Integer.valueOf(tiles[col]);
+							}
+						}
+						row++;
+					}                
+
+				}
+
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+
+		return levelData;
 	}
 
 
@@ -292,6 +356,7 @@ public class GrafixatorFileLoader {
 					spriteIndex++;
 				}
 			}
+			Animation animation=null;
 			if (spriteIsAnim.equalsIgnoreCase("true")) {
 				
 				int spriteIndex = 0;
@@ -299,12 +364,14 @@ public class GrafixatorFileLoader {
 					TextureRegion spriteTexture =extractTextureRegion(spritesTexture,  (int) point.x, (int) point.y, spriteWidth, spriteHeight);
 					MapProperties spriteProperties = getSpriteProperties(spriteElement);
 					
-					Animation animation=null;
+					
 					boolean isAnimation=false;
 					
 					isAnimation=true;
-					animation=getSpriteAnimation(spriteSheetPosition,  spritesTexture,  spriteWidth,  spriteHeight, spriteNoFrames);
-					
+					if (animation ==null) {
+					  animation=getSpriteAnimation(spriteSheetPosition,  spritesTexture,  spriteWidth,  spriteHeight, spriteNoFrames);
+					  System.out.println("ANIMATION IS TRUE : : : : : " + spriteNoFrames + "  texture: " + spriteTexture.getRegionHeight());
+					}
 					if (spriteProperties == null) spriteProperties = new MapProperties();
 					addGrafixatorSpriteToGame(grafixatorGame,  null, spriteProperties,  Integer.valueOf(id), spriteIndex, -1, -1, (int) point.x, (int) point.y, spriteWidth ,spriteHeight, false, spriteTexture, isAnimation, animation);
 					spriteIndex++;
